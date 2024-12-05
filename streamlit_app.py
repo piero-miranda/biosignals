@@ -4,6 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt
 
+# URLs del permalink de GitHub (raw)
+ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
+emg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/max4.csv"
+
+# Cargar los archivos CSV desde los permalinks
+
 # Función para cargar la señal desde el archivo CSV
 def load_signal(csv_file):
     try:
@@ -79,19 +85,18 @@ def emg_page():
     st.title('Electromiograma (EMG)')
 
     # Ruta del archivo CSV para ECG (ya cargado por defecto)
-    file_path = '/workspaces/biosignals/max4.csv'
-    ecg_signal = load_signal(file_path)
+    emg_signal = pd.read_csv(emg_url)
     sampling_rate = 1000  # 1000 Hz
 
     # Selección del intervalo de tiempo para graficar
-    start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 0.0, 0.001)
-    end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 10.0, 0.001)
+    start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(emg_signal)/sampling_rate, 0.0, 0.001)
+    end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(emg_signal)/sampling_rate, 10.0, 0.001)
 
     # Opción de "Señal Filtrada" usando st.radio
     filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
 
     # Graficar la señal ECG en el intervalo seleccionado
-    fig = plot_time_domain(ecg_signal, sampling_rate, "Señal ECG", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
+    fig = plot_time_domain(emg_signal, sampling_rate, "Señal EMG", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
     st.pyplot(fig)
 
     # Selección de características para extraer utilizando st.multiselect
@@ -100,7 +105,7 @@ def emg_page():
 
     # Extraer características
     if st.button('Extraer características'):
-        features = extract_features(ecg_signal, sampling_rate, start_time, end_time, selected_features)
+        features = extract_features(emg_signal, sampling_rate, start_time, end_time, selected_features)
         for feature, value in features.items():
             st.write(f'{feature}: {value:.4f}')
 
@@ -109,8 +114,7 @@ def ecg_page():
     st.title('Electrocardiograma (ECG)')
 
     # Ruta del archivo CSV para ECG (ya cargado por defecto)
-    file_path = '/workspaces/biosignals/basald1-2.csv'
-    ecg_signal = load_signal(file_path)
+    ecg_signal = pd.read_csv(ecg_url)
     sampling_rate = 1000  # 1000 Hz
 
     # Selección del intervalo de tiempo para graficar

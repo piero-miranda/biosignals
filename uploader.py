@@ -1,12 +1,9 @@
-import io
-import streamlit as st
+import os
 import pandas as pd
+import streamlit as st
 
-# Cargar datos desde un archivo subido por el usuario
-uploaded_file = st.file_uploader("Sube un archivo CSV", type=["csv"])
-
-if uploaded_file is not None:
-    # Leer el archivo CSV
-    signal_data = pd.read_csv(uploaded_file)
-    st.write('Datos cargados:')
-    st.write(signal_data.head())
+file_path = '/workspaces/biosignals/max4.csv'
+if os.path.exists(file_path):
+    ecg_signal = pd.read_csv(file_path)
+else:
+    st.error(f"Error: El archivo {file_path} no se encuentra.")
