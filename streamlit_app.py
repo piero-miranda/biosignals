@@ -4,9 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt
 
-# Ruta del archivo CSV que contiene los datos ECG
-file_path = '/workspaces/biosignals/basald1-2.csv'  # Ajusta esta ruta a la ubicación del archivo en tu codespace
-
 # Función para cargar la señal desde el archivo CSV
 def load_signal(csv_file):
     try:
@@ -53,7 +50,6 @@ def butter_lowpass_filter(data, cutoff, fs, order=4):
     y = filtfilt(b, a, data)  # Aplicar el filtro pasabajas
     return y
 
-
 # Función para calcular características de la señal
 def extract_features(signal, fs, start_time, end_time, selected_features):
     start_idx = int(start_time * fs)
@@ -78,47 +74,103 @@ def extract_features(signal, fs, start_time, end_time, selected_features):
 
     return features
 
-# Cargar los datos ECG
-signal_data = load_signal(file_path)
-sampling_rate = 1000  # 1000 Hz
-cutoff_frequency = 30  # Frecuencia de corte para el filtro pasabajas
+# Página EMG
+def emg_page():
+    st.title('Electromiograma (EMG)')
 
-# Interfaz de Streamlit
-st.title('Tratamiento de Señales ECG')
+    # Ruta del archivo CSV para ECG (ya cargado por defecto)
+    file_path = '/workspaces/biosignals/max4.csv'
+    ecg_signal = load_signal(file_path)
+    sampling_rate = 1000  # 1000 Hz
 
-# Selección del intervalo de tiempo para graficar
-st.subheader('Selecciona el intervalo de tiempo para graficar')
-start_time = st.slider('Tiempo de inicio (en segundos)', min_value=0.0, max_value=(len(signal_data) / sampling_rate), value=0.0, step=0.001)
-end_time = st.slider('Tiempo de fin (en segundos)', min_value=0.0, max_value=(len(signal_data) / sampling_rate), value=1.0, step=0.001)
+    # Selección del intervalo de tiempo para graficar
+    start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 0.0, 0.001)
+    end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 10.0, 0.001)
 
-# Opción de "Señal Filtrada" usando st.radio
-filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
+    # Opción de "Señal Filtrada" usando st.radio
+    filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
 
-# Graficar la señal ECG en el intervalo seleccionado
-fig = plot_time_domain(signal_data, sampling_rate, "Señal Basal ECG", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
+    # Graficar la señal ECG en el intervalo seleccionado
+    fig = plot_time_domain(ecg_signal, sampling_rate, "Señal ECG", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
+    st.pyplot(fig)
 
-# Mostrar el gráfico en Streamlit
-st.pyplot(fig)
-
-# Selección de características para extraer utilizando st.pills (o multiselect)
-st.subheader('Selecciona las características a extraer')
+    # Selección de características para extraer utilizando st.multiselect
+    selected_features = st.pills('Características',['Valor Medio', 'Desviación Estándar', 'Entropía'], selection_mode="multi")
 
 
-selected_features = st.pills(
-    'Características',
-    ['Valor Medio', 'Desviación Estándar', 'Entropía'], selection_mode="multi")
-
-
-# Mostrar el botón para extraer características
-if st.button('Extraer características'):
-    st.subheader('Características extraídas de la señal')
-
-    # Extraer las características seleccionadas
-    features = extract_features(signal_data, sampling_rate, start_time, end_time, selected_features)
-
-    # Mostrar las características seleccionadas en texto
-    if features:
+    # Extraer características
+    if st.button('Extraer características'):
+        features = extract_features(ecg_signal, sampling_rate, start_time, end_time, selected_features)
         for feature, value in features.items():
             st.write(f'{feature}: {value:.4f}')
-    else:
-        st.write("No se seleccionaron características para extraer.")
+
+# Página ECG
+def ecg_page():
+    st.title('Electrocardiograma (ECG)')
+
+    # Ruta del archivo CSV para ECG (ya cargado por defecto)
+    file_path = '/workspaces/biosignals/basald1-2.csv'
+    ecg_signal = load_signal(file_path)
+    sampling_rate = 1000  # 1000 Hz
+
+    # Selección del intervalo de tiempo para graficar
+    start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 0.0, 0.001)
+    end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(ecg_signal)/sampling_rate, 10.0, 0.001)
+
+    # Opción de "Señal Filtrada" usando st.radio
+    filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
+
+    # Graficar la señal ECG en el intervalo seleccionado
+    fig = plot_time_domain(ecg_signal, sampling_rate, "Señal ECG", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
+    st.pyplot(fig)
+
+    # Selección de características para extraer utilizando st.multiselect
+    selected_features = st.pills('Características',['Valor Medio', 'Desviación Estándar', 'Entropía'], selection_mode="multi")
+
+
+    # Extraer características
+    if st.button('Extraer características'):
+        features = extract_features(ecg_signal, sampling_rate, start_time, end_time, selected_features)
+        for feature, value in features.items():
+            st.write(f'{feature}: {value:.4f}')
+
+# Página Tratamiento de Señales
+def signal_treatment_page():
+    st.title('Tratamiento de Señales')
+
+    # Subir archivo CSV
+    uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
+    if uploaded_file:
+        signal_data = load_signal(uploaded_file)
+        sampling_rate = 1000  # Puedes ajustar esto según el archivo subido
+        st.write(f"Se cargaron {len(signal_data)} muestras.")
+        
+        # Selección de intervalo de tiempo para graficar
+        start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(signal_data)/sampling_rate, 0.0, 0.001)
+        end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(signal_data)/sampling_rate, 10.0, 0.001)
+
+        # Opción de "Señal Filtrada"
+        filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
+
+        # Graficar la señal en el intervalo seleccionado
+        fig = plot_time_domain(signal_data, sampling_rate, "Señal", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
+        st.pyplot(fig)
+
+        # Selección de características para extraer utilizando st.multiselect
+        selected_features = st.pills('Características',['Valor Medio', 'Desviación Estándar', 'Entropía'], selection_mode="multi")
+
+        # Extraer características
+        if st.button('Extraer características'):
+            features = extract_features(signal_data, sampling_rate, start_time, end_time, selected_features)
+            for feature, value in features.items():
+                st.write(f'{feature}: {value:.4f}')
+
+# Menú lateral para navegar entre las páginas
+menu = st.sidebar.radio("Selecciona una página", ["EMG", "ECG", "Tratamiento de señales"])
+
+if menu == "EMG":
+    emg_page()
+elif menu == "ECG":
+    ecg_page()
+else:
+    signal_treatment_page()
