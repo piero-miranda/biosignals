@@ -506,7 +506,13 @@ def bitalino_converter_page():
         except Exception as e:
             st.error(f"Ocurrió un error al procesar el archivo: {e}")
 
-# Agregar la página al menú lateral
+# URL del logo en formato RAW
+logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/a6a3c2d325e85711f4d89ce567557782c99ba3cd/LOGO_1.png"
+
+# Mostrar logo en el menú lateral
+st.sidebar.image(logo_url, use_container_width=True)
+
+# Menú lateral
 menu = st.sidebar.radio("Selecciona una página", ["ECG", "EMG", "EEG", "Tratamiento de señales", "Convertidor BITalino"])
 
 if menu == "ECG":
