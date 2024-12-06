@@ -48,24 +48,18 @@ def emg_page():
             st.write(f'{feature}: {value:.4f}')
 
     if st.checkbox('Mostrar Transformada Wavelet Discreta (DWT)'):
-        start_time = st.number_input('Tiempo de inicio (segundos)', min_value=0.0, value=0.0, step=0.1)
-        end_time = st.number_input('Tiempo de fin (segundos)', min_value=0.0, value=len(ecg_signal) / sampling_rate, step=0.1)
         levels = st.slider('Selecciona el número de niveles de descomposición', 1, 6, 3)
         wavelet = st.selectbox('Selecciona el tipo de wavelet', ['db4', 'haar', 'sym5'])
         fig = plot_dwt(emg_signal, wavelet=wavelet, levels=levels, fs=sampling_rate, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
     if st.checkbox('Mostrar Espectrograma (FFT)'):
-        start_time = st.number_input('Tiempo de inicio (segundos)', min_value=0.0, value=0.0, step=0.1, key="start_fft")
-        end_time = st.number_input('Tiempo de fin (segundos)', min_value=0.0, value=len(ecg_signal) / sampling_rate, step=0.1, key="end_fft")
         nperseg = st.slider('Segmentos para FFT', 64, 1024, 256)
         noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
         fig = plot_spectrogram(emg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
     if st.checkbox('Mostrar STFT'):
-        start_time = st.number_input('Tiempo de inicio (segundos)', min_value=0.0, value=0.0, step=0.1, key="start_stft")
-        end_time = st.number_input('Tiempo de fin (segundos)', min_value=0.0, value=len(ecg_signal) / sampling_rate, step=0.1, key="end_stft")
         nperseg = st.slider('Segmentos para STFT', 64, 1024, 256)
         noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
         fig = plot_stft(emg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap, start_time=start_time, end_time=end_time)
