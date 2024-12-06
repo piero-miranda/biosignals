@@ -19,7 +19,6 @@ st.sidebar.markdown("""
 El participante del estudio mantuvo la fuerza por un intervalo de tiempo sosteniendo un objeto.
 """)
 
-
 emg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/max4.csv"
 
 # Página EMG
