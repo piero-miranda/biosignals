@@ -9,6 +9,7 @@ import pywt
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
 emg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/max4.csv"
 
+
 # Filtro pasabajas
 def butter_lowpass_filter(data, cutoff, fs, order=4):
     padlen = 3 * order
@@ -157,6 +158,8 @@ def extract_features(signal, fs, start_time, end_time, selected_features, signal
 # Página EMG
 def emg_page():
     st.title('Electromiograma (EMG)')
+    st.markdown("Técnica que mide la actividad eléctrica generada por los músculos durante la contracción o el reposo, utilizada para evaluar su función y diagnosticar trastornos neuromusculares.")
+
     emg_signal = pd.read_csv(emg_url).iloc[:, 0].values
     sampling_rate = 1000
 
@@ -189,6 +192,9 @@ def emg_page():
 # Página ECG
 def ecg_page():
     st.title('Electrocardiograma (ECG)')
+
+    st.markdown("Método que registra la actividad eléctrica del corazón a lo largo del tiempo para analizar su ritmo y detectar condiciones como arritmias o enfermedades cardíacas.")
+
     ecg_signal = pd.read_csv(ecg_url).iloc[:, 0].values
     sampling_rate = 1000
 
