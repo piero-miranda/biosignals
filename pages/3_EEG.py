@@ -8,6 +8,11 @@ eeg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/1312455150
 # Configurar el logo en el sidebar
 short_logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/53e8eec9636b4c91bb94b79d4a4c0237b642d171/short_logo.png"
 st.sidebar.image(short_logo_url, use_container_width=True)
+st.sidebar.markdown("""
+**Sobre la señal:**
+Configuración Einthoven Lead I con electrodos en las clavículas e iliaca. 
+Frecuencia de muestreo: **1000 Hz**.
+""")
 
 # Página EEG
 def eeg_page():

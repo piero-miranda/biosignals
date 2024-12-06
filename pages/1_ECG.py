@@ -6,6 +6,11 @@ from funciones import plot_time_domain, extract_features, plot_dwt, plot_spectro
 # Configurar el logo en el sidebar
 short_logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/53e8eec9636b4c91bb94b79d4a4c0237b642d171/short_logo.png"
 st.sidebar.image(short_logo_url, use_container_width=True)
+st.sidebar.markdown("""
+**Sobre la señal:**
+Se colocaron electrodos en la posición FP2 (según el sistema internacional 10-20), permitiendo medir actividad de ondas beta. 
+Frecuencia de muestreo: **1000 Hz**.
+""")
 
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
 
