@@ -22,7 +22,6 @@ st.sidebar.markdown("""
 El participante del estudio hizo la acción de pestañear por intervalos cortos de tiempo.
 """)
 
-
 # Página EEG
 def eeg_page():
     st.title('Electroencefalograma (EEG)')
