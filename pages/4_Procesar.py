@@ -105,6 +105,5 @@ def signal_treatment_page():
             st.pyplot(fig)
 
 
-# Renderizar la página automáticamente si se ejecuta directamente
 if __name__ == "__main__":
     signal_treatment_page()
