@@ -14,6 +14,15 @@ Configuración Einthoven Lead I con electrodos en las clavículas e iliaca.
 Frecuencia de muestreo: **1000 Hz**.
 """)
 
+# Imagen de la posición de EEG en el sidebar
+eeg_image_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/c99d4f9dd012ebcc6d3eeb063cd7498f8fa1b0fc/posic_eeg.png"
+st.sidebar.image(eeg_image_url, use_container_width=True)
+
+st.sidebar.markdown("""
+El participante del estudio hizo la acción de pestañear por intervalos cortos de tiempo.
+""")
+
+
 # Página EEG
 def eeg_page():
     st.title('Electroencefalograma (EEG)')

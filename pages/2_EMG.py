@@ -11,6 +11,15 @@ Electrodos ubicados sobre el músculo biceps brachii y una referencia en el hues
 Frecuencia de muestreo: **1000 Hz**
 """)
 
+# Imagen de la posición de EMG en el sidebar
+emg_image_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/c99d4f9dd012ebcc6d3eeb063cd7498f8fa1b0fc/posic_emg.png"
+st.sidebar.image(emg_image_url, use_container_width=True)
+
+st.sidebar.markdown("""
+El participante del estudio mantuvo la fuerza por un intervalo de tiempo sosteniendo un objeto.
+""")
+
+
 emg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/max4.csv"
 
 # Página EMG

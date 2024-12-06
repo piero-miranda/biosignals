@@ -12,6 +12,14 @@ Se colocaron electrodos en la posición FP2 (según el sistema internacional 10-
 Frecuencia de muestreo: **1000 Hz**.
 """)
 
+# Imagen de la posición de ECG en el sidebar
+ecg_image_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/c99d4f9dd012ebcc6d3eeb063cd7498f8fa1b0fc/posic_ecg.png"
+st.sidebar.image(ecg_image_url, use_container_width=True)
+
+st.sidebar.markdown("""
+El participante del estudio se mantuvo en estado basal durante toda la grabación de la señal.
+""")
+
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
 
 def ecg_page():
