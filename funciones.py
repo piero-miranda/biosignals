@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt, spectrogram, find_peaks
 import pywt
 from scipy.signal import stft
+import streamlit as st
+import pandas as pd
+from streamlit_option_menu import option_menu
 
 # URLs del permalink de GitHub (raw)
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
@@ -101,7 +104,6 @@ def plot_cwt(signal, wavelet='cmor', scales=None, fs=1000):
     ax.set_title('CWT (Transformada Wavelet Continua)')
     return fig
 
-
 def plot_stft(signal, fs=1000, nperseg=256, noverlap=128):
     """
     Graficar STFT de una señal.
@@ -176,7 +178,6 @@ def calculate_eeg_features(segment, selected_features):
         peaks, _ = find_peaks(segment, height=0)  # Detectar picos
         features['Número de Picos'] = len(peaks)  # Número total de picos
     return features
-
 
 # Función para calcular todas las características
 def extract_features(signal, fs, start_time, end_time, selected_features, signal_type):
@@ -295,7 +296,6 @@ def ecg_page():
         fig = plot_cwt(ecg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
         st.pyplot(fig)
 
-
 # Página EEG
 def eeg_page():
     st.title('Electroencefalograma (EEG)')
@@ -346,7 +346,6 @@ def eeg_page():
         fig = plot_cwt(eeg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
         st.pyplot(fig)
     
-
 # Página Tratamiento de Señales
 def signal_treatment_page():
     st.title('Tratamiento de Señales')
@@ -446,9 +445,6 @@ def signal_treatment_page():
             fig = plot_cwt(signal_data, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
             st.pyplot(fig)
 
-import streamlit as st
-import pandas as pd
-
 def process_bitalino_file(file_content):
     """
     Procesa un archivo BITalino cargado como texto y extrae la última columna de datos.
@@ -506,22 +502,43 @@ def bitalino_converter_page():
         except Exception as e:
             st.error(f"Ocurrió un error al procesar el archivo: {e}")
 
-# URL del logo en formato RAW
-logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/a6a3c2d325e85711f4d89ce567557782c99ba3cd/LOGO_1.png"
+def home_page():
+    """Página de inicio con el resumen y las descripciones técnicas."""
+    st.title("Bienvenido a Biosignals")
+    st.markdown(
+        """
+        ### Descripción General
+        **Biosignals** es una aplicación diseñada para el análisis, visualización y procesamiento de señales biomédicas 
+        como EEG, ECG y EMG. A través de esta plataforma, los usuarios pueden:
+        
+        - Analizar señales electroencefalográficas (EEG) para estudiar la actividad cerebral.
+        - Examinar señales electromiográficas (EMG) para evaluar la función muscular.
+        - Explorar señales electrocardiográficas (ECG) para analizar la actividad cardíaca.
+        - Convertir archivos de texto generados por BITalino en formato CSV para facilitar su uso.
+        
+        ### Adquisición de Señales
+        Las señales utilizadas en esta aplicación han sido adquiridas con sensores BITalino, configurados para registrar 
+        muestras a una frecuencia de muestreo de **1000 Hz**. A continuación, se describen los procedimientos y configuraciones específicas:
+        
+        #### EEG (Electroencefalografía)
+        - **Electrodos:** Sensor EEG colocado en la posición **FP2** (frente, encima del ojo derecho) según el sistema internacional 10-20.
+        - **Objetivo:** Medición de ondas beta, indicativas de pensamiento activo.
+        
+        #### EMG (Electromiografía)
+        - **Electrodos:** Dos electrodos de medición colocados a lo largo de las fibras musculares en el músculo **bíceps braquial**, y un electrodo de referencia en el hueso (codo o clavícula).
+        - **Objetivo:** Evaluación de la actividad muscular durante la contracción.
+        
+        #### ECG (Electrocardiografía)
+        - **Electrodos:** Configuración de **Einthoven Lead I**, con el electrodo positivo (rojo) en la clavícula izquierda, el negativo (negro) en la clavícula derecha y el de referencia (blanco) en la cresta ilíaca.
+        - **Objetivo:** Registro de la actividad eléctrica cardíaca para análisis del ritmo y condiciones del corazón.
 
-# Mostrar logo en el menú lateral
-st.sidebar.image(logo_url, use_container_width=True)
+        ### ¿Qué puedes hacer con esta aplicación?
+        Explora las distintas páginas disponibles en el menú lateral:
+        - **EEG:** Analiza señales cerebrales para estudiar ondas beta y actividad cognitiva.
+        - **EMG:** Evalúa la función muscular y registra contracciones específicas.
+        - **ECG:** Explora la actividad eléctrica del corazón y analiza intervalos R-R.
+        - **Tratamiento de señales:** Procesa tus señales subidas en formato CSV.
+        - **Conversión TXT a CSV:** Convierte archivos de texto generados por BITalino a un formato CSV utilizable.
+        """
+    )
 
-# Menú lateral
-menu = st.sidebar.radio("Selecciona una página", ["ECG", "EMG", "EEG", "Tratamiento de señales", "Convertidor BITalino"])
-
-if menu == "ECG":
-    ecg_page()
-elif menu == "EMG":
-    emg_page()
-elif menu == "EEG":
-    eeg_page()
-elif menu == "Tratamiento de señales":
-    signal_treatment_page()
-elif menu == "Convertidor BITalino":
-    bitalino_converter_page()
