@@ -61,8 +61,80 @@ def plot_time_domain(signal, fs, title, start_time, end_time, filtered=False):
     ax.set_xlim([start_time, end_time])
     return fig
 
-# Gráfico de DWT
-def plot_dwt(signal, wavelet='db4', levels=3, fs=1000):
+def plot_spectrogram(signal, fs=1000, nperseg=256, noverlap=128, start_time=None, end_time=None):
+    """
+    Graficar espectrograma de una señal, considerando un intervalo de tiempo.
+    Parameters:
+    - signal: Señal de entrada.
+    - fs: Frecuencia de muestreo.
+    - nperseg: Número de puntos por segmento.
+    - noverlap: Superposición entre segmentos.
+    - start_time: Tiempo de inicio (en segundos).
+    - end_time: Tiempo de fin (en segundos).
+    """
+    # Extraer segmento de interés
+    if start_time is not None and end_time is not None:
+        start_idx = int(start_time * fs)
+        end_idx = int(end_time * fs)
+        signal = signal[start_idx:end_idx]
+    
+    # Generar el espectrograma
+    f, t, Sxx = spectrogram(signal, fs, nperseg=nperseg, noverlap=noverlap)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    cax = ax.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud', cmap='viridis')
+    fig.colorbar(cax, ax=ax, label='Densidad de potencia (dB)')
+    ax.set_ylabel('Frecuencia (Hz)')
+    ax.set_xlabel('Tiempo (s)')
+    ax.set_title('Espectrograma')
+    return fig
+
+
+def plot_stft(signal, fs=1000, nperseg=256, noverlap=128, start_time=None, end_time=None):
+    """
+    Graficar STFT de una señal, considerando un intervalo de tiempo.
+    Parameters:
+    - signal: Señal de entrada.
+    - fs: Frecuencia de muestreo.
+    - nperseg: Número de puntos por segmento.
+    - noverlap: Superposición entre segmentos.
+    - start_time: Tiempo de inicio (en segundos).
+    - end_time: Tiempo de fin (en segundos).
+    """
+    # Extraer segmento de interés
+    if start_time is not None and end_time is not None:
+        start_idx = int(start_time * fs)
+        end_idx = int(end_time * fs)
+        signal = signal[start_idx:end_idx]
+    
+    # Generar STFT
+    f, t, Zxx = stft(signal, fs, nperseg=nperseg, noverlap=noverlap)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    cax = ax.pcolormesh(t, f, np.abs(Zxx), shading='gouraud', cmap='viridis')
+    fig.colorbar(cax, ax=ax, label='Amplitud')
+    ax.set_ylabel('Frecuencia (Hz)')
+    ax.set_xlabel('Tiempo (s)')
+    ax.set_title('STFT (Transformada de Fourier de Tiempo Corto)')
+    return fig
+
+
+def plot_dwt(signal, wavelet='db4', levels=3, fs=1000, start_time=None, end_time=None):
+    """
+    Graficar DWT de una señal, considerando un intervalo de tiempo.
+    Parameters:
+    - signal: Señal de entrada.
+    - wavelet: Tipo de wavelet.
+    - levels: Número de niveles de descomposición.
+    - fs: Frecuencia de muestreo.
+    - start_time: Tiempo de inicio (en segundos).
+    - end_time: Tiempo de fin (en segundos).
+    """
+    # Extraer segmento de interés
+    if start_time is not None and end_time is not None:
+        start_idx = int(start_time * fs)
+        end_idx = int(end_time * fs)
+        signal = signal[start_idx:end_idx]
+    
+    # Calcular la DWT
     coeffs = pywt.wavedec(signal, wavelet, level=levels)
     fig, axs = plt.subplots(levels + 1, 1, figsize=(10, 8))
     fig.suptitle('Transformada Wavelet Discreta (DWT)', fontsize=16)
@@ -80,6 +152,7 @@ def plot_dwt(signal, wavelet='db4', levels=3, fs=1000):
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     return fig
+
 
 def plot_cwt(signal, start_time, end_time, wavelet='cmor', scales=None, fs=1000):
     """
@@ -121,34 +194,6 @@ def plot_cwt(signal, start_time, end_time, wavelet='cmor', scales=None, fs=1000)
     ax.set_title('CWT (Transformada Wavelet Continua)')
     return fig
 
-def plot_stft(signal, fs=1000, nperseg=256, noverlap=128):
-    """
-    Graficar STFT de una señal.
-    Parameters:
-    - signal: Señal de entrada.
-    - fs: Frecuencia de muestreo.
-    - nperseg: Número de puntos por segmento.
-    - noverlap: Superposición entre segmentos.
-    """
-    f, t, Zxx = stft(signal, fs, nperseg=nperseg, noverlap=noverlap)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    cax = ax.pcolormesh(t, f, np.abs(Zxx), shading='gouraud', cmap='viridis')
-    fig.colorbar(cax, ax=ax, label='Amplitud')
-    ax.set_ylabel('Frecuencia (Hz)')
-    ax.set_xlabel('Tiempo (s)')
-    ax.set_title('STFT (Transformada de Fourier de Tiempo Corto)')
-    return fig
-
-# Gráfico del espectrograma
-def plot_spectrogram(signal, fs=1000, nperseg=256, noverlap=128):
-    f, t, Sxx = spectrogram(signal, fs, nperseg=nperseg, noverlap=noverlap)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    cax = ax.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud', cmap='viridis')
-    fig.colorbar(cax, ax=ax, label='Densidad de potencia (dB)')
-    ax.set_ylabel('Frecuencia (Hz)')
-    ax.set_xlabel('Tiempo (s)')
-    ax.set_title('Espectrograma')
-    return fig
 
 # Cálculo de características adicionales de EMG
 def calculate_emg_features(segment, selected_features):
