@@ -446,8 +446,68 @@ def signal_treatment_page():
             fig = plot_cwt(signal_data, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
             st.pyplot(fig)
 
-# Menú lateral
-menu = st.sidebar.radio("Selecciona una página", ["ECG", "EMG", "EEG", "Tratamiento de señales"])
+import streamlit as st
+import pandas as pd
+
+def process_bitalino_file(file_content):
+    """
+    Procesa un archivo BITalino cargado como texto y extrae la última columna de datos.
+    
+    Parameters:
+    - file_content: Contenido del archivo TXT cargado como BytesIO.
+    
+    Returns:
+    - DataFrame con los datos procesados.
+    """
+    # Leer el archivo línea por línea
+    lines = file_content.decode("utf-8").split("\n")
+    
+    # Filtrar solo las líneas de datos, ignorando las primeras 3 líneas (cabecera)
+    data_lines = [line.strip() for line in lines if line.strip()][3:]
+    
+    # Dividir las líneas en columnas basadas en espacios o tabulaciones
+    data = [line.split() for line in data_lines]
+    
+    # Crear un DataFrame con los datos
+    df = pd.DataFrame(data)
+    
+    # Mantener solo la última columna
+    df = df.iloc[:, -1]
+    
+    return df
+
+def bitalino_converter_page():
+    """
+    Página para convertir un archivo TXT de BITalino a un archivo CSV descargable.
+    """
+    st.title("Convertidor de Archivos BITalino")
+    st.markdown("Sube un archivo TXT generado por BITalino y conviértelo automáticamente a un archivo CSV descargable.")
+    
+    # Subir el archivo TXT
+    uploaded_file = st.file_uploader("Sube tu archivo TXT de BITalino", type=["txt"])
+    
+    if uploaded_file:
+        try:
+            # Procesar el archivo
+            df = process_bitalino_file(uploaded_file.getvalue())
+            
+            # Mostrar una vista previa de los datos procesados
+            st.subheader("Vista previa de los datos procesados")
+            st.dataframe(df.head(10))  # Muestra las primeras 10 filas
+            
+            # Generar archivo CSV descargable
+            csv = df.to_csv(index=False, header=False).encode("utf-8")
+            st.download_button(
+                label="Descargar archivo CSV",
+                data=csv,
+                file_name="bitalino_procesado.csv",
+                mime="text/csv"
+            )
+        except Exception as e:
+            st.error(f"Ocurrió un error al procesar el archivo: {e}")
+
+# Agregar la página al menú lateral
+menu = st.sidebar.radio("Selecciona una página", ["ECG", "EMG", "EEG", "Tratamiento de señales", "Convertidor BITalino"])
 
 if menu == "ECG":
     ecg_page()
@@ -455,5 +515,7 @@ elif menu == "EMG":
     emg_page()
 elif menu == "EEG":
     eeg_page()
-else:
+elif menu == "Tratamiento de señales":
     signal_treatment_page()
+elif menu == "Convertidor BITalino":
+    bitalino_converter_page()
