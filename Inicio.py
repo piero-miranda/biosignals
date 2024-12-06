@@ -1,8 +1,8 @@
 import streamlit as st
 
 # Configurar el logo en el sidebar
-logo_main_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/ea4531f80608cf0936c142e224aba9844a40b4aa/logo_final.png"
-st.image(logo_main_url, use_container_width=True)
+full_logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/53e8eec9636b4c91bb94b79d4a4c0237b642d171/logo_full.png"
+st.image(full_logo_url, use_container_width=True)
 
 
 # Bienvenida en el sidebar

@@ -4,8 +4,8 @@ import numpy as np
 from funciones import plot_time_domain, extract_features, plot_dwt, plot_spectrogram, plot_stft, plot_cwt
 
 # Configurar el logo en el sidebar
-logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/ea4531f80608cf0936c142e224aba9844a40b4aa/short_logo.png"
-st.sidebar.image(logo_url, use_container_width=True)
+short_logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/53e8eec9636b4c91bb94b79d4a4c0237b642d171/short_logo.png"
+st.sidebar.image(short_logo_url, use_container_width=True)
 
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
 
