@@ -81,11 +81,14 @@ def plot_dwt(signal, wavelet='db4', levels=3, fs=1000):
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     return fig
 
-def plot_cwt(signal, wavelet='cmor', scales=None, fs=1000):
+def plot_cwt(signal, start_time, end_time, wavelet='cmor', scales=None, fs=1000):
     """
-    Graficar CWT de una señal.
+    Graficar CWT de un segmento de señal.
+    
     Parameters:
     - signal: Señal de entrada.
+    - start_time: Tiempo de inicio del segmento (en segundos).
+    - end_time: Tiempo de fin del segmento (en segundos).
     - wavelet: Tipo de wavelet (por ejemplo, 'cmor', 'mexh').
     - scales: Escalas para la transformada wavelet.
     - fs: Frecuencia de muestreo.
@@ -95,9 +98,23 @@ def plot_cwt(signal, wavelet='cmor', scales=None, fs=1000):
     if scales is None:
         scales = np.arange(1, 128)
 
-    coefficients, frequencies = pywt.cwt(signal, scales, wavelet, 1/fs)
+    # Seleccionar el segmento de la señal
+    start_idx = int(start_time * fs)
+    end_idx = int(end_time * fs)
+    segment = signal[start_idx:end_idx]
+
+    # Calcular la CWT del segmento
+    coefficients, frequencies = pywt.cwt(segment, scales, wavelet, 1 / fs)
+
+    # Crear el gráfico
     fig, ax = plt.subplots(figsize=(10, 6))
-    cax = ax.pcolormesh(np.arange(len(signal)) / fs, frequencies, np.abs(coefficients), shading='gouraud', cmap='viridis')
+    cax = ax.pcolormesh(
+        np.arange(len(segment)) / fs + start_time,  # Ajustar el eje de tiempo al segmento
+        frequencies,
+        np.abs(coefficients),
+        shading='gouraud',
+        cmap='viridis'
+    )
     fig.colorbar(cax, ax=ax, label='Amplitud')
     ax.set_ylabel('Frecuencia (Hz)')
     ax.set_xlabel('Tiempo (s)')
