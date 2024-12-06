@@ -52,7 +52,7 @@ def plot_time_domain(signal, fs, title, start_time, end_time, filtered=False):
     ax.plot(t[start_idx:end_idx], segment)
     ax.set_title(f'Señal en el dominio del tiempo - {title}')
     ax.set_xlabel('Tiempo (s)')
-    ax.set_ylabel('Amplitud')
+    ax.set_ylabel('Amplitud (mV)')
     ax.grid(True)
     ax.set_xlim([start_time, end_time])
     return fig
