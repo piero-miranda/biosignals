@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Configurar el logo en el sidebar
-logo_url = "assets/LOGO_1.png"  # Ruta del logo
+logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/ea4531f80608cf0936c142e224aba9844a40b4aa/short_logo.png"
 st.sidebar.image(logo_url, use_container_width=True)
 
 # Página Tratamiento de Señales
