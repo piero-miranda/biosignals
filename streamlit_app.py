@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt, spectrogram, find_peaks
 import pywt
+from scipy.signal import stft
 
 # URLs del permalink de GitHub (raw)
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
@@ -75,6 +76,48 @@ def plot_dwt(signal, wavelet='db4', levels=3, fs=1000):
         axs[i].grid(True)
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
+    return fig
+
+def plot_cwt(signal, wavelet='cmor', scales=None, fs=1000):
+    """
+    Graficar CWT de una señal.
+    Parameters:
+    - signal: Señal de entrada.
+    - wavelet: Tipo de wavelet (por ejemplo, 'cmor', 'mexh').
+    - scales: Escalas para la transformada wavelet.
+    - fs: Frecuencia de muestreo.
+    """
+    import pywt
+
+    if scales is None:
+        scales = np.arange(1, 128)
+
+    coefficients, frequencies = pywt.cwt(signal, scales, wavelet, 1/fs)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    cax = ax.pcolormesh(np.arange(len(signal)) / fs, frequencies, np.abs(coefficients), shading='gouraud', cmap='viridis')
+    fig.colorbar(cax, ax=ax, label='Amplitud')
+    ax.set_ylabel('Frecuencia (Hz)')
+    ax.set_xlabel('Tiempo (s)')
+    ax.set_title('CWT (Transformada Wavelet Continua)')
+    return fig
+
+
+def plot_stft(signal, fs=1000, nperseg=256, noverlap=128):
+    """
+    Graficar STFT de una señal.
+    Parameters:
+    - signal: Señal de entrada.
+    - fs: Frecuencia de muestreo.
+    - nperseg: Número de puntos por segmento.
+    - noverlap: Superposición entre segmentos.
+    """
+    f, t, Zxx = stft(signal, fs, nperseg=nperseg, noverlap=noverlap)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    cax = ax.pcolormesh(t, f, np.abs(Zxx), shading='gouraud', cmap='viridis')
+    fig.colorbar(cax, ax=ax, label='Amplitud')
+    ax.set_ylabel('Frecuencia (Hz)')
+    ax.set_xlabel('Tiempo (s)')
+    ax.set_title('STFT (Transformada de Fourier de Tiempo Corto)')
     return fig
 
 # Gráfico del espectrograma
@@ -193,6 +236,18 @@ def emg_page():
         noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
         fig = plot_spectrogram(emg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
         st.pyplot(fig)
+    
+    if st.checkbox('Mostrar STFT'):
+        nperseg = st.slider('Segmentos para STFT', 64, 1024, 256)
+        noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
+        fig = plot_stft(emg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
+        st.pyplot(fig)
+
+    if st.checkbox('Mostrar CWT'):
+        wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
+        scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
+        fig = plot_cwt(emg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
+        st.pyplot(fig)
 
 # Página ECG
 def ecg_page():
@@ -227,6 +282,19 @@ def ecg_page():
         noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
         fig = plot_spectrogram(ecg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
         st.pyplot(fig)
+    
+    if st.checkbox('Mostrar STFT'):
+        nperseg = st.slider('Segmentos para STFT', 64, 1024, 256)
+        noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
+        fig = plot_stft(ecg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
+        st.pyplot(fig)
+
+    if st.checkbox('Mostrar CWT'):
+        wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
+        scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
+        fig = plot_cwt(ecg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
+        st.pyplot(fig)
+
 
 # Página EEG
 def eeg_page():
@@ -266,26 +334,67 @@ def eeg_page():
         fig = plot_spectrogram(eeg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
         st.pyplot(fig)
 
+    if st.checkbox('Mostrar STFT'):
+        nperseg = st.slider('Segmentos para STFT', 64, 1024, 256)
+        noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
+        fig = plot_stft(eeg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
+        st.pyplot(fig)
+
+    if st.checkbox('Mostrar CWT'):
+        wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
+        scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
+        fig = plot_cwt(eeg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
+        st.pyplot(fig)
+    
+
 # Página Tratamiento de Señales
 def signal_treatment_page():
     st.title('Tratamiento de Señales')
+    st.markdown(
+        """
+        **Instrucciones para subir un archivo:**
+        - El archivo debe estar en formato CSV.
+        - El archivo debe contener una sola columna con los valores de la señal.
+        - No se requiere una columna de timestamp.
+        """
+    )
 
+    # Subir archivo CSV
     uploaded_file = st.file_uploader("Sube tu archivo CSV", type=["csv"])
     if uploaded_file:
-        signal_data = pd.read_csv(uploaded_file).iloc[:, 0].values
-        sampling_rate = 1000
-        st.write(f"Se cargaron {len(signal_data)} muestras.")
+        # Solicitar la frecuencia de muestreo
+        sampling_rate = st.number_input(
+            "Ingrese la frecuencia de muestreo (Hz):",
+            min_value=1,
+            max_value=100000,
+            value=1000,
+            step=1,
+            help="Frecuencia de muestreo utilizada para capturar la señal."
+        )
 
+        # Leer y mostrar información del archivo subido
+        try:
+            signal_data = pd.read_csv(uploaded_file).iloc[:, 0].values
+            st.write(f"Se cargaron {len(signal_data)} muestras.")
+        except Exception as e:
+            st.error(f"Error al leer el archivo: {e}")
+            return
+
+        # Seleccionar el tipo de señal
         signal_type = st.selectbox("Seleccione el tipo de señal", ["ECG", "EMG", "EEG"])
 
+        # Selección de intervalo de tiempo para graficar
         start_time = st.slider('Tiempo de inicio (en segundos)', 0.0, len(signal_data) / sampling_rate, 0.0, 0.001)
         end_time = st.slider('Tiempo de fin (en segundos)', 0.0, len(signal_data) / sampling_rate, 10.0, 0.001)
 
+        # Opción de "Señal Filtrada"
         filter_signal = st.radio('Seleccione el tipo de señal', ['No Filtrada', 'Filtrada'])
 
+        # Graficar la señal en el intervalo seleccionado
         fig = plot_time_domain(signal_data, sampling_rate, "Señal", start_time, end_time, filtered=(filter_signal == 'Filtrada'))
         st.pyplot(fig)
 
+        # Características según el tipo de señal
         if signal_type == "EMG":
             selected_features = st.pills(
                 'Características',
@@ -305,21 +414,36 @@ def signal_treatment_page():
                 selection_mode="multi"
             )
 
+        # Extraer características
         if st.button('Extraer características'):
             features = extract_features(signal_data, sampling_rate, start_time, end_time, selected_features, signal_type)
             for feature, value in features.items():
                 st.write(f'{feature}: {value:.4f}')
 
+        # Opcional: Mostrar transformada wavelet discreta (DWT)
         if st.checkbox('Mostrar Transformada Wavelet Discreta (DWT)'):
             levels = st.slider('Selecciona el número de niveles de descomposición', 1, 6, 3)
             wavelet = st.selectbox('Selecciona el tipo de wavelet', ['db4', 'haar', 'sym5'])
             fig = plot_dwt(signal_data, wavelet=wavelet, levels=levels, fs=sampling_rate)
             st.pyplot(fig)
 
+        # Opcional: Mostrar espectrograma
         if st.checkbox('Mostrar Espectrograma (FFT)'):
             nperseg = st.slider('Segmentos para FFT', 64, 1024, 256)
             noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
             fig = plot_spectrogram(signal_data, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
+            st.pyplot(fig)
+        
+        if st.checkbox('Mostrar STFT'):
+            nperseg = st.slider('Segmentos para STFT', 64, 1024, 256)
+            noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
+            fig = plot_stft(signal_data, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
+            st.pyplot(fig)
+
+        if st.checkbox('Mostrar CWT'):
+            wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
+            scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
+            fig = plot_cwt(signal_data, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
             st.pyplot(fig)
 
 # Menú lateral
