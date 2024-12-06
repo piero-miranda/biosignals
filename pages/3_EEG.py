@@ -69,7 +69,7 @@ def eeg_page():
     if st.checkbox('Mostrar CWT'):
         wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
         scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
-        fig = plot_cwt(eeg_signal, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
+        fig = plot_cwt(eeg_signal, start_time=start_time, end_time=end_time, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
         st.pyplot(fig)
     
 

@@ -99,6 +99,12 @@ def signal_treatment_page():
             noverlap = st.slider('Superposición entre segmentos (STFT)', 0, nperseg - 1, 128)
             fig = plot_stft(signal_data, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
             st.pyplot(fig)
+        
+        if st.checkbox('Mostrar CWT'):
+            wavelet = st.selectbox('Selecciona el tipo de wavelet (CWT)', ['cmor', 'mexh'])
+            scales = st.slider('Selecciona las escalas máximas (CWT)', 1, 128, 64)
+            fig = plot_cwt(signal_data, start_time=start_time, end_time=end_time, wavelet=wavelet, scales=np.arange(1, scales + 1), fs=sampling_rate)
+            st.pyplot(fig)
 
 
 # Renderizar la página automáticamente si se ejecuta directamente
