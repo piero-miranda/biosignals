@@ -2,12 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt, spectrogram, find_peaks
+from scipy.signal import butter, filtfilt, find_peaks
 import pywt
 from scipy.signal import stft
 import streamlit as st
 import pandas as pd
-from streamlit_option_menu import option_menu
 
 # URLs del permalink de GitHub (raw)
 ecg_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/501a52199bd6310d678dde38157c885d15ee1b51/basald1-2.csv"
