@@ -1,5 +1,5 @@
 import streamlit as st
-from funciones import plot_time_domain, extract_features, plot_dwt, plot_spectrogram, plot_stft, plot_cwt
+from funciones import plot_time_domain, extract_features, plot_dwt, plot_fft, plot_psd, plot_stft, plot_cwt
 import numpy as np
 import pandas as pd
 
@@ -86,10 +86,13 @@ def signal_treatment_page():
             fig = plot_dwt(signal_data, wavelet=wavelet, levels=levels, fs=sampling_rate, start_time=start_time, end_time=end_time)
             st.pyplot(fig)
 
-        if st.checkbox('Mostrar Espectrograma (FFT)'):
-            nperseg = st.slider('Segmentos para FFT', 64, 1024, 256)
-            noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
-            fig = plot_spectrogram(signal_data, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap, start_time=start_time, end_time=end_time)
+        if st.checkbox('Mostrar FFT (dB vs Frecuencia)'):
+            freq_unit = st.radio("Selecciona la unidad de frecuencia", ["Hz", "rad/s"])
+            fig = plot_fft(signal_data, fs=sampling_rate, start_time=start_time, end_time=end_time, freq_unit=freq_unit)
+            st.pyplot(fig)
+
+        if st.checkbox('Mostrar Densidad Espectral de Potencia (PSD)'):
+            fig = plot_psd(signal_data, fs=sampling_rate, start_time=start_time, end_time=end_time)
             st.pyplot(fig)
 
         if st.checkbox('Mostrar STFT'):

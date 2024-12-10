@@ -61,31 +61,55 @@ def plot_time_domain(signal, fs, title, start_time, end_time, filtered=False):
     ax.set_xlim([start_time, end_time])
     return fig
 
-def plot_spectrogram(signal, fs=1000, nperseg=256, noverlap=128, start_time=None, end_time=None):
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_fft(signal, fs=1000, start_time=None, end_time=None, freq_unit="Hz"):
     """
-    Graficar espectrograma de una señal, considerando un intervalo de tiempo.
+    Graficar FFT de una señal (dB vs. Frecuencias), considerando un intervalo de tiempo.
+    
     Parameters:
     - signal: Señal de entrada.
     - fs: Frecuencia de muestreo.
-    - nperseg: Número de puntos por segmento.
-    - noverlap: Superposición entre segmentos.
     - start_time: Tiempo de inicio (en segundos).
     - end_time: Tiempo de fin (en segundos).
+    - freq_unit: Unidad de frecuencia ("Hz" o "rad/s").
     """
     # Extraer segmento de interés
     if start_time is not None and end_time is not None:
         start_idx = int(start_time * fs)
         end_idx = int(end_time * fs)
         signal = signal[start_idx:end_idx]
-    
-    # Generar el espectrograma
-    f, t, Sxx = spectrogram(signal, fs, nperseg=nperseg, noverlap=noverlap)
+
+    # Calcular FFT
+    N = len(signal)
+    freq = np.fft.fftfreq(N, 1 / fs)  # Todas las frecuencias (incluye negativas)
+    fft_magnitude = np.abs(np.fft.fft(signal))  # Magnitud de FFT
+    fft_magnitude_db = 20 * np.log10(fft_magnitude)  # Convertir a dB
+
+    # Ajustar la escala de frecuencia
+    if freq_unit == "rad/s":
+        freq = 2 * np.pi * freq / fs  # Convertir a rad/s
+        freq = np.fft.fftshift(freq)  # Reordenar para que sea simétrica de -pi a pi
+        fft_magnitude_db = np.fft.fftshift(fft_magnitude_db)  # Reordenar magnitudes
+
+    # Crear gráfico
     fig, ax = plt.subplots(figsize=(10, 6))
-    cax = ax.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud', cmap='viridis')
-    fig.colorbar(cax, ax=ax, label='Densidad de potencia (dB)')
-    ax.set_ylabel('Frecuencia (Hz)')
-    ax.set_xlabel('Tiempo (s)')
-    ax.set_title('Espectrograma')
+    ax.plot(freq, fft_magnitude_db, color='blue')
+    ax.set_title(f'FFT: Magnitud en dB vs Frecuencia ({freq_unit})')
+    ax.set_ylabel('Magnitud (dB)')
+    ax.grid(True)
+
+    # Ajustar límites y etiquetas para rad/s
+    if freq_unit == "rad/s":
+        ax.set_xlim(-np.pi, np.pi)
+        ticks = [-np.pi, -np.pi / 2, 0, np.pi / 2, np.pi]
+        tick_labels = [r'$-\pi$', r'$-\pi/2$', r'$0$', r'$\pi/2$', r'$\pi$']
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(tick_labels)
+    else:
+        ax.set_xlabel('Frecuencia (Hz)')
+
     return fig
 
 
@@ -151,6 +175,37 @@ def plot_dwt(signal, wavelet='db4', levels=3, fs=1000, start_time=None, end_time
         axs[i].grid(True)
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
+    return fig
+
+from scipy.signal import welch
+
+def plot_psd(signal, fs=1000, start_time=None, end_time=None):
+    """
+    Graficar la densidad espectral de potencia (PSD) de una señal, considerando un intervalo de tiempo.
+    
+    Parameters:
+    - signal: Señal de entrada.
+    - fs: Frecuencia de muestreo.
+    - start_time: Tiempo de inicio (en segundos).
+    - end_time: Tiempo de fin (en segundos).
+    """
+    # Extraer segmento de interés
+    if start_time is not None and end_time is not None:
+        start_idx = int(start_time * fs)
+        end_idx = int(end_time * fs)
+        signal = signal[start_idx:end_idx]
+
+    # Calcular la PSD
+    from scipy.signal import welch
+    f, psd = welch(signal, fs=fs, nperseg=256)
+
+    # Crear gráfico
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.semilogy(f, psd, color='green')  # Escala logarítmica en el eje Y
+    ax.set_title('Densidad Espectral de Potencia (PSD)')
+    ax.set_xlabel('Frecuencia (Hz)')
+    ax.set_ylabel('PSD (V²/Hz)')
+    ax.grid(True)
     return fig
 
 

@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from funciones import plot_time_domain, extract_features, plot_dwt, plot_spectrogram, plot_stft, plot_cwt
+from funciones import plot_time_domain, extract_features, plot_dwt, plot_psd, plot_stft, plot_cwt, plot_fft
 
 # Configurar el logo en el sidebar
 short_logo_url = "https://raw.githubusercontent.com/piero-miranda/biosignals/53e8eec9636b4c91bb94b79d4a4c0237b642d171/short_logo.png"
@@ -49,10 +49,13 @@ def ecg_page():
         fig = plot_dwt(ecg_signal, wavelet=wavelet, levels=levels, fs=sampling_rate, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
-    if st.checkbox('Mostrar Espectrograma (FFT)'):
-        nperseg = st.slider('Segmentos para FFT', 64, 1024, 256)
-        noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
-        fig = plot_spectrogram(ecg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap, start_time=start_time, end_time=end_time)
+    if st.checkbox('Mostrar FFT (dB vs Frecuencia)'):
+        freq_unit = st.radio("Selecciona la unidad de frecuencia", ["Hz", "rad/s"])
+        fig = plot_fft(ecg_signal, fs=sampling_rate, start_time=start_time, end_time=end_time, freq_unit=freq_unit)
+        st.pyplot(fig)
+
+    if st.checkbox('Mostrar Densidad Espectral de Potencia (PSD)'):
+        fig = plot_psd(ecg_signal, fs=sampling_rate, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
     if st.checkbox('Mostrar STFT'):

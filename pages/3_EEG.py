@@ -1,5 +1,5 @@
 import streamlit as st
-from funciones import plot_time_domain, extract_features, plot_dwt, plot_spectrogram, plot_stft, plot_cwt
+from funciones import plot_time_domain, extract_features, plot_dwt, plot_fft, plot_psd, plot_stft, plot_cwt
 import pandas as pd
 import numpy as np
 
@@ -54,10 +54,13 @@ def eeg_page():
         fig = plot_dwt(eeg_signal, wavelet=wavelet, levels=levels, fs=sampling_rate, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
-    if st.checkbox('Mostrar Espectrograma (FFT)'):
-        nperseg = st.slider('Segmentos para FFT', 64, 1024, 256)
-        noverlap = st.slider('Superposición entre segmentos', 0, nperseg - 1, 128)
-        fig = plot_spectrogram(eeg_signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap, start_time=start_time, end_time=end_time)
+    if st.checkbox('Mostrar FFT (dB vs Frecuencia)'):
+        freq_unit = st.radio("Selecciona la unidad de frecuencia", ["Hz", "rad/s"])
+        fig = plot_fft(eeg_signal, fs=sampling_rate, start_time=start_time, end_time=end_time, freq_unit=freq_unit)
+        st.pyplot(fig)
+
+    if st.checkbox('Mostrar Densidad Espectral de Potencia (PSD)'):
+        fig = plot_psd(eeg_signal, fs=sampling_rate, start_time=start_time, end_time=end_time)
         st.pyplot(fig)
 
     if st.checkbox('Mostrar STFT'):
